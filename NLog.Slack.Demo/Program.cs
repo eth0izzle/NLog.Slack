@@ -22,7 +22,7 @@ namespace NLog.Slack.Demo
             }
             catch (Exception ex)
             {
-                _logger.Error("KABOOM!", ex);
+                _logger.Error("KABOOM!!!", ex);
             }
 
             Console.WriteLine("Done - check your Slack channel!");
