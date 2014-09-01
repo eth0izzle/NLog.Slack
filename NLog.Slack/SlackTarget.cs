@@ -13,7 +13,7 @@ namespace NLog.Slack
     {
         //// ----------------------------------------------------------------------------------------------------------
 
-        private static readonly Process _currentProcess = Process.GetCurrentProcess();
+        private readonly Process _currentProcess = Process.GetCurrentProcess();
 
         //// ----------------------------------------------------------------------------------------------------------
 
