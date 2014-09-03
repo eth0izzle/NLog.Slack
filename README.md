@@ -71,13 +71,11 @@ public class Example
         config.LoggingRules.Add(slackTargetRules);
 
         LogManager.Configuration = config;
-        
-        // Good to go!
     }
 }
 ```
 
-3. Check out your sexy logs!
+And your good to go!
 
 ### Configuration Options
 
