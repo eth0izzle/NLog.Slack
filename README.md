@@ -12,8 +12,10 @@ Installation
 
 Usage
 =====
+1. Create a new Incoming Webhook integration.
+2. Configure NLog to use the target:
 
-Simply update your NLog.config to load the NLog.Slack extension and add a new `<target />`. Or [configure programmatically](https://github.com/nlog/NLog/wiki/Configuration-API) by instantiating [`NLog.Slack.SlackTarget`](https://github.com/eth0izzle/NLog.Slack/blob/master/NLog.Slack/SlackTarget.cs), setting the relevant public properties and adding it to your `LoggingConfiguration` `LoggingRules`.
+### NLog.config
 
 ```xml
 <?xml version="1.0" encoding="utf-8" ?>
@@ -41,12 +43,48 @@ Simply update your NLog.config to load the NLog.Slack extension and add a new `<
 </nlog>
 ```
 
+Note: it's recommended to set ```async="true"``` so if the HTTP call to Slack fails it doesn't slow down your application.
+
+### Programmatically 
+
+```
+using NLog;
+using NLog.Config;
+using NLog.Slack;
+
+public class Example
+{
+    public static void Main(string[] args)
+    {
+        var config = new LoggingConfiguration();
+        
+        var slackTarget = new SlackTarget
+            {
+                  Layout = "${message}",
+                  WebHookUrl = "http://xx.slack.com/services/hooks/incoming-webhook?token=xxx",
+                  Channel = "#log"
+            };
+        
+        config.AddTarget("slack", slackTarget);
+
+        var slackTargetRules = new LoggingRule("*", LogLevel.Debug, slackTarget);
+        config.LoggingRules.Add(slackTargetRules);
+
+        LogManager.Configuration = config;
+        
+        // Good to go!
+    }
+}
+```
+
+3. Check out your sexy logs!
+
+### Configuration Options
+
 Key        | Description
 ----------:| -----------
-webHookUrl | Grab your Webhook URL (__with the token__) from your Incoming WebHooks integration in Slack
-channel    | The channel name (e.g #log) or user (e.g. @eth0) to send NLog messages to. Leave blank to use the integration default
-username   | Name of the user that NLog messages comes from. Leave blank to use the integration default
-verbose    | Set to false to just send the NLog layout text (no process info, colors, etc)
-icon       | Leave blank to use the integration default. Can either be a URL or Emoji
-
-Note: it's recommended to set ```async="true"``` so if the HTTP call to Slack fails or times out it doesn't slow down your application.
+WebHookUrl | Grab your Webhook URL (__with the token__) from your Incoming Webhooks integration in Slack
+Channel    | The channel name (e.g #log) or user (e.g. @eth0) to send NLog messages to. Leave blank to use the integration default
+Username   | Name of the user that NLog messages comes from. Leave blank to use the integration default
+Verbose    | Set to false to just send the NLog layout text (no process info, colors, etc)
+Icon       | Leave blank to use the integration default. Can either be a URL or Emoji
