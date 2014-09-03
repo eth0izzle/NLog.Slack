@@ -13,7 +13,7 @@ Installation
 Usage
 =====
 
-Simply update your NLog.config to load the NLog.Slack extension and add a new `<target />`.
+Simply update your NLog.config to load the NLog.Slack extension and add a new `<target />`. Or [configure programmatically](https://github.com/nlog/NLog/wiki/Configuration-API) by instantiating [`NLog.Slack.SlackTarget`](https://github.com/eth0izzle/NLog.Slack/blob/master/NLog.Slack/SlackTarget.cs), setting the relevant public properties and adding it to your `LoggingConfiguration` `LoggingRules`.
 
 ```xml
 <?xml version="1.0" encoding="utf-8" ?>
