@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Linq;
 using NLog.Common;
 using NLog.Config;
 using NLog.Layouts;
@@ -9,7 +10,7 @@ using NLog.Targets;
 namespace NLog.Slack
 {
     [Target("Slack")]
-    public sealed class SlackTarget : TargetWithLayout
+    public class SlackTarget : TargetWithLayout
     {
         //// ----------------------------------------------------------------------------------------------------------
 
@@ -34,7 +35,25 @@ namespace NLog.Slack
 
         //// ----------------------------------------------------------------------------------------------------------
 
-        public bool Verbose { get; set; }
+        public bool Compact { get; set; }
+
+        //// ----------------------------------------------------------------------------------------------------------
+
+        protected override void InitializeTarget()
+        {
+            base.InitializeTarget();
+
+            if (String.IsNullOrWhiteSpace(this.WebHookUrl))
+                throw new ArgumentOutOfRangeException("WebHookUrl", "Webhook URL cannot be empty.");
+
+            Uri uriResult;
+            if (!Uri.TryCreate(this.WebHookUrl, UriKind.Absolute, out uriResult))
+                throw new ArgumentOutOfRangeException("WebHookUrl", "Webhook URL is an invalid URL.");
+
+            if (!String.IsNullOrWhiteSpace(this.Channel)
+                && !"@#".Any(this.Channel.Contains))
+                throw new ArgumentOutOfRangeException("Channel", "The Channel name is invalid. It must start with either a # or a @ symbol.");
+        }
 
         //// ----------------------------------------------------------------------------------------------------------
 
@@ -69,7 +88,7 @@ namespace NLog.Slack
             if (!String.IsNullOrWhiteSpace(this.Username))
                 slack.AsUser(this.Username);
 
-            if (this.Verbose)
+            if (!this.Compact)
             {
                 var attachment = new Attachment(message);
                 attachment.Color = this.GetSlackColorFromLogLevel(info.LogEvent.Level);

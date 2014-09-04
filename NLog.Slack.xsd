@@ -20,7 +20,7 @@
           <element name="webHookUrl" type="string" minOccurs="1" maxOccurs="1" nillable="false" />
           <element name="channel" type="string" minOccurs="0" maxOccurs="1" />
           <element name="username" type="string" minOccurs="0" maxOccurs="1" />
-          <element name="verbose" type="boolean" minOccurs="0" maxOccurs="1" default="true" />
+          <element name="compact" type="boolean" minOccurs="0" maxOccurs="1" default="false" />
           <element name="icon" type="strng" minOccurs="0" maxOccurs="1" />
         </choice>
         <attribute name="layout" type="nlog:SimpleLayoutAttribute">
@@ -43,9 +43,9 @@
             <documentation>Name of the user that NLog messages comes from. Leave blank to use the integration default.</documentation>
           </annotation>
         </attribute>
-        <attribute name="verbose" type="boolean" default="true">
+        <attribute name="compact" type="boolean" default="false">
           <annotation>
-            <documentation>Set to false to just send the NLog layout text (no process info, colors, etc)</documentation>
+            <documentation>Set to true to just send the NLog layout text (no process info, colors, etc)</documentation>
           </annotation>
         </attribute>
         <attribute name="icon" type="string">
