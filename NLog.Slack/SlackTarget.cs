@@ -41,8 +41,6 @@ namespace NLog.Slack
 
         protected override void InitializeTarget()
         {
-            base.InitializeTarget();
-
             if (String.IsNullOrWhiteSpace(this.WebHookUrl))
                 throw new ArgumentOutOfRangeException("WebHookUrl", "Webhook URL cannot be empty.");
 
@@ -53,6 +51,8 @@ namespace NLog.Slack
             if (!String.IsNullOrWhiteSpace(this.Channel)
                 && !"@#".Any(this.Channel.Contains))
                 throw new ArgumentOutOfRangeException("Channel", "The Channel name is invalid. It must start with either a # or a @ symbol.");
+
+            base.InitializeTarget();
         }
 
         //// ----------------------------------------------------------------------------------------------------------
@@ -61,7 +61,7 @@ namespace NLog.Slack
         {
             try
             {
-                SendToSlack(info);
+                this.SendToSlack(info);
             }
             catch (Exception e)
             {
@@ -96,11 +96,11 @@ namespace NLog.Slack
                 var exception = info.LogEvent.Exception;
                 if (exception != null)
                 {
-                    if (!String.IsNullOrWhiteSpace(exception.StackTrace))
-                        attachment.Fields.Insert(0, new Field("Stack Trace") { Value = "```" + exception.StackTrace + "```" });
+                    attachment.Fields.Add(new Field("Type") { Value = exception.GetType().FullName, Short = true });
+                    attachment.Fields.Add(new Field("Message") { Value = exception.Message, Short = true });
 
-                    attachment.Fields.Insert(0, new Field("Type") { Value = exception.GetType().FullName, Short = true });
-                    attachment.Fields.Insert(0, new Field("Message") { Value = exception.Message, Short = true });
+                    if (!String.IsNullOrWhiteSpace(exception.StackTrace))
+                        attachment.Fields.Add(new Field("Stack Trace") { Value = "```" + exception.StackTrace + "```" });
                 }
 
                 attachment.Fields.Add(new Field("Process Name") { Value = String.Format("{0}\\{1}", _currentProcess.MachineName, _currentProcess.ProcessName), Short = true });
