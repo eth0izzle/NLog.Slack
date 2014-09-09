@@ -6,7 +6,7 @@ An NLog target for Slack - your logs in one place and instantly searchable, ever
 
 Installation
 ============
-```Install-Package NLog.Slack```
+Via NuGet: ```Install-Package NLog.Slack```
 
 ... or just build it your self!
 
