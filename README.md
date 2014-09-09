@@ -6,14 +6,14 @@ An NLog target for Slack - your logs in one place and instantly searchable, ever
 
 Installation
 ============
-Via NuGet: ```Install-Package NLog.Slack```
+Via [NuGet](https://www.nuget.org/packages/NLog.Slack/): ```Install-Package NLog.Slack```
 
 ... or just build it your self!
 
 Usage
 =====
-1. Create a new Incoming Webhook integration.
-2. Configure NLog to use the target:
+1. Create a [new Incoming Webhook integration](https://www.slack.com/integrations).
+2. Configure NLog to use `NLog.Slack`:
 
 ### NLog.config
 
@@ -30,7 +30,7 @@ Usage
     <target xsi:type="Slack"
             name="slackTarget"
             layout="${message}"
-            webHookUrl="https://tummi.slack.com/services/hooks/incoming-webhook?token=xxx"
+            webHookUrl="https://xxx.slack.com/services/hooks/incoming-webhook?token=xxx"
             channel="#log"
             username="NLog.Slack"
             compact="false"
@@ -43,39 +43,28 @@ Usage
 </nlog>
 ```
 
-Note: it's recommended to set ```async="true"``` so if the HTTP call to Slack fails it doesn't slow down your application.
+Note: it's recommended to set ```async="true"``` on `targets` so if the HTTP call to Slack fails or times out it doesn't slow down your application.
 
 ### Programmatically 
 
 ```
-using NLog;
-using NLog.Config;
-using NLog.Slack;
-
-public class Example
+var config = new LoggingConfiguration();
+var slackTarget = new SlackTarget
 {
-    public static void Main(string[] args)
-    {
-        var config = new LoggingConfiguration();
-        
-        var slackTarget = new SlackTarget
-            {
-                  Layout = "${message}",
-                  WebHookUrl = "http://xx.slack.com/services/hooks/incoming-webhook?token=xxx",
-                  Channel = "#log"
-            };
-        
-        config.AddTarget("slack", slackTarget);
+      Layout = "${message}",
+      WebHookUrl = "http://xxx.slack.com/services/hooks/incoming-webhook?token=xxx",
+      Channel = "#log"
+};
 
-        var slackTargetRules = new LoggingRule("*", LogLevel.Debug, slackTarget);
-        config.LoggingRules.Add(slackTargetRules);
+config.AddTarget("slack", slackTarget);
 
-        LogManager.Configuration = config;
-    }
-}
+var slackTargetRules = new LoggingRule("*", LogLevel.Debug, slackTarget);
+config.LoggingRules.Add(slackTargetRules);
+
+LogManager.Configuration = config;
 ```
 
-And your good to go!
+And you're good to go!
 
 ### Configuration Options
 
