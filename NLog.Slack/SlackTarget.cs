@@ -103,7 +103,7 @@ namespace NLog.Slack
                         attachment.Fields.Add(new Field("Stack Trace") { Value = "```" + exception.StackTrace + "```" });
                 }
 
-                attachment.Fields.Add(new Field("Process Name") { Value = String.Format("{0}\\{1}", _currentProcess.MachineName, _currentProcess.ProcessName), Short = true });
+                attachment.Fields.Add(new Field("Process Name") { Value = String.Format("{0}\\{1}", (_currentProcess.MachineName != "." ? _currentProcess.MachineName : System.Environment.MachineName), _currentProcess.ProcessName), Short = true });
                 attachment.Fields.Add(new Field("Process PID") { Value = _currentProcess.Id.ToString(), Short = true });
 
                 slack.AddAttachment(attachment);
