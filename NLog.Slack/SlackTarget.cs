@@ -23,11 +23,11 @@ namespace NLog.Slack
 
         //// ----------------------------------------------------------------------------------------------------------
 
-        public string Channel { get; set; }
+        public Layout Channel { get; set; }
 
         //// ----------------------------------------------------------------------------------------------------------
 
-        public string Username { get; set; }
+        public Layout Username { get; set; }
 
         //// ----------------------------------------------------------------------------------------------------------
 
@@ -48,8 +48,8 @@ namespace NLog.Slack
             if (!Uri.TryCreate(this.WebHookUrl, UriKind.Absolute, out uriResult))
                 throw new ArgumentOutOfRangeException("WebHookUrl", "Webhook URL is an invalid URL.");
 
-            if (!String.IsNullOrWhiteSpace(this.Channel)
-                && !"@#".Any(this.Channel.Contains))
+            if (!String.IsNullOrWhiteSpace(this.Channel.ToString())
+                && !"@#".Any(this.Channel.ToString().Contains))
                 throw new ArgumentOutOfRangeException("Channel", "The Channel name is invalid. It must start with either a # or a @ symbol.");
 
             base.InitializeTarget();
@@ -79,14 +79,14 @@ namespace NLog.Slack
                 .OnError(e => info.Continuation(e))
                 .WithMessage(message);
 
-            if (!String.IsNullOrWhiteSpace(this.Channel))
-                slack.ToChannel(this.Channel);
+            if (!String.IsNullOrWhiteSpace(this.Channel.Render(info.LogEvent)))
+                slack.ToChannel(this.Channel.Render(info.LogEvent));
 
             if (!String.IsNullOrWhiteSpace(this.Icon))
                 slack.WithIcon(this.Icon);
 
-            if (!String.IsNullOrWhiteSpace(this.Username))
-                slack.AsUser(this.Username);
+            if (!String.IsNullOrWhiteSpace(this.Username.Render(info.LogEvent)))
+                slack.AsUser(this.Username.Render(info.LogEvent));
 
             if (!this.Compact)
             {
