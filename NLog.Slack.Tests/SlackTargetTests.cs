@@ -91,6 +91,30 @@ namespace NLog.Slack.Tests
             slackTarget.Initialize();
         }
 
+        [TestMethod, ExpectedException(typeof(ArgumentOutOfRangeException))]
+        public void InitializeTarget_IncorrectChannel_ExtraCharWithAt_ShouldThrowException()
+        {
+            var slackTarget = new TestableSlackTarget
+            {
+                WebHookUrl = "http://slack.is.awesome.com",
+                Channel = "w@slackbot"
+            };
+
+            slackTarget.Initialize();
+        }
+
+        [TestMethod, ExpectedException(typeof(ArgumentOutOfRangeException))]
+        public void InitializeTarget_IncorrectChannel_ExtraCharWithHash_ShouldThrowException()
+        {
+            var slackTarget = new TestableSlackTarget
+            {
+                WebHookUrl = "http://slack.is.awesome.com",
+                Channel = "w#log"
+            };
+
+            slackTarget.Initialize();
+        }
+
         //// ----------------------------------------------------------------------------------------------------------
 
         [TestMethod]
@@ -109,6 +133,20 @@ namespace NLog.Slack.Tests
 
         [TestMethod]
         public void InitializeTarget_CorrectChannelWithAt_TargetShouldInitialize()
+        {
+            var slackTarget = new TestableSlackTarget
+            {
+                WebHookUrl = "http://slack.is.awesome.com",
+                Channel = "@slackbot"
+            };
+
+            slackTarget.Initialize();
+        }
+
+        //// ----------------------------------------------------------------------------------------------------------
+        
+        [TestMethod]
+        public void InitializeTarget_CorrectChannelWithVariable_TargetShouldInitialize()
         {
             var slackTarget = new TestableSlackTarget
             {

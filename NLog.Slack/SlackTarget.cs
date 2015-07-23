@@ -23,11 +23,11 @@ namespace NLog.Slack
 
         //// ----------------------------------------------------------------------------------------------------------
 
-        public Layout Channel { get; set; }
+        public SimpleLayout Channel { get; set; }
 
         //// ----------------------------------------------------------------------------------------------------------
 
-        public Layout Username { get; set; }
+        public SimpleLayout Username { get; set; }
 
         //// ----------------------------------------------------------------------------------------------------------
 
@@ -48,9 +48,9 @@ namespace NLog.Slack
             if (!Uri.TryCreate(this.WebHookUrl, UriKind.Absolute, out uriResult))
                 throw new ArgumentOutOfRangeException("WebHookUrl", "Webhook URL is an invalid URL.");
 
-            if (!String.IsNullOrWhiteSpace(this.Channel.ToString())
-                && !"@#".Any(this.Channel.ToString().Contains))
-                throw new ArgumentOutOfRangeException("Channel", "The Channel name is invalid. It must start with either a # or a @ symbol.");
+            if (!String.IsNullOrWhiteSpace(this.Channel.Text)
+                && (!this.Channel.Text.StartsWith("#") && !this.Channel.Text.StartsWith("@") && !this.Channel.Text.StartsWith("${")))
+                throw new ArgumentOutOfRangeException("Channel", "The Channel name is invalid. It must start with either a # or a @ symbol or use a variable.");
 
             base.InitializeTarget();
         }
