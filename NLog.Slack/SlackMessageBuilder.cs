@@ -1,6 +1,8 @@
 ﻿using System;
+
+using Newtonsoft.Json;
+
 using NLog.Slack.Models;
-using ServiceStack;
 
 namespace NLog.Slack
 {
@@ -16,7 +18,7 @@ namespace NLog.Slack
 
         //// ----------------------------------------------------------------------------------------------------------
 
-        private Payload _payload;
+        private readonly Payload _payload;
 
         //// ----------------------------------------------------------------------------------------------------------
 
@@ -102,7 +104,7 @@ namespace NLog.Slack
 
         public void Send()
         {
-            this._client.Send(this._webHookUrl, this._payload.ToJson());
+            this._client.Send(this._webHookUrl, JsonConvert.SerializeObject(_payload));
         }
 
         //// ----------------------------------------------------------------------------------------------------------
