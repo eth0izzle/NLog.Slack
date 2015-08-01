@@ -1,5 +1,5 @@
 ﻿using System;
-using ServiceStack;
+using System.Net;
 
 namespace NLog.Slack
 {
@@ -15,7 +15,11 @@ namespace NLog.Slack
         {
             try
             {
-                url.PostJsonToUrl(data);
+                using (var client = new WebClient())
+                {
+                    client.Headers[HttpRequestHeader.ContentType] = "application/json";
+                    client.UploadString(url, "POST", data);
+                }
             }
             catch (Exception e)
             {
