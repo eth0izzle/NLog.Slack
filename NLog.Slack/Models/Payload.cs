@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
+using System.IO;
 using System.Runtime.Serialization;
+using System.Runtime.Serialization.Json;
 
 namespace NLog.Slack.Models
 {
@@ -41,6 +43,23 @@ namespace NLog.Slack.Models
         public Payload()
         {
             this.Attachments = new List<Attachment>();
+        }
+
+        //// ----------------------------------------------------------------------------------------------------------
+
+        public string ToJson()
+        {
+            var serializer = new DataContractJsonSerializer(typeof(Payload));
+            using (var memoryStream = new MemoryStream())
+            {
+                serializer.WriteObject(memoryStream, this);
+                memoryStream.Position = 0;
+                using (var reader = new StreamReader(memoryStream))
+                {
+                    string json = reader.ReadToEnd();
+                    return json;
+                }
+            }
         }
 
         //// ----------------------------------------------------------------------------------------------------------
