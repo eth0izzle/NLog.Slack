@@ -18,7 +18,7 @@ namespace NLog.Slack.Demo
 
             try
             {
-                throw new ApplicationException("I'm the exception to the rule.");
+                CreateBigStackTrace(20);
             }
             catch (Exception ex)
             {
@@ -27,6 +27,20 @@ namespace NLog.Slack.Demo
 
             Console.WriteLine("Done - check your Slack channel!");
             Console.ReadLine();
+        }
+
+        //// ----------------------------------------------------------------------------------------------------------
+
+        private static void CreateBigStackTrace(int lines)
+        {
+            if (lines < 1)
+            {
+                throw new ApplicationException("I'm the exception to the rule.");
+            }
+            else
+            {
+                CreateBigStackTrace(lines - 1);
+            }
         }
 
         //// ----------------------------------------------------------------------------------------------------------

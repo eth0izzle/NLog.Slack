@@ -90,23 +90,24 @@ namespace NLog.Slack
 
             if (!this.Compact)
             {
-                var attachment = new Attachment(message);
-                attachment.Color = this.GetSlackColorFromLogLevel(info.LogEvent.Level);
+                var color = this.GetSlackColorFromLogLevel(info.LogEvent.Level);
+                var attachment = new Attachment(message) { Color = color };
+                attachment.Fields.Add(new Field("Process Name") { Value = String.Format("{0}\\{1}", (_currentProcess.MachineName != "." ? _currentProcess.MachineName : System.Environment.MachineName), _currentProcess.ProcessName), Short = true });
+                attachment.Fields.Add(new Field("Process PID") { Value = _currentProcess.Id.ToString(), Short = true });
+                slack.AddAttachment(attachment);
 
                 var exception = info.LogEvent.Exception;
                 if (exception != null)
                 {
-                    attachment.Fields.Add(new Field("Type") { Value = exception.GetType().FullName, Short = true });
-                    attachment.Fields.Add(new Field("Message") { Value = exception.Message, Short = true });
+                    var exceptionAttachment = new Attachment(exception.Message) { Color = color };
+                    exceptionAttachment.Fields.Add(new Field("Type") { Value = exception.GetType().FullName, Short = true });
 
                     if (!String.IsNullOrWhiteSpace(exception.StackTrace))
-                        attachment.Fields.Add(new Field("Stack Trace") { Value = "```" + exception.StackTrace + "```" });
+                        exceptionAttachment.Text = exception.StackTrace;
+
+                    slack.AddAttachment(exceptionAttachment);
                 }
 
-                attachment.Fields.Add(new Field("Process Name") { Value = String.Format("{0}\\{1}", (_currentProcess.MachineName != "." ? _currentProcess.MachineName : System.Environment.MachineName), _currentProcess.ProcessName), Short = true });
-                attachment.Fields.Add(new Field("Process PID") { Value = _currentProcess.Id.ToString(), Short = true });
-
-                slack.AddAttachment(attachment);
             }
 
             slack.Send();
