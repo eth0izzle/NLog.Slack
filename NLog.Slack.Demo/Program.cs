@@ -14,7 +14,7 @@ namespace NLog.Slack.Demo
         {
             _logger.Info("This is a piece of useful information.");
             _logger.Debug("I be debuggin' all night long");
-            _logger.Warn("Warning, warning...");
+            _logger.Warn("Warning, warning... I'm UTF8 ready : 你好世界.");
 
             try
             {
