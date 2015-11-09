@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Net;
+using System.Text;
 
 namespace NLog.Slack
 {
@@ -18,6 +19,7 @@ namespace NLog.Slack
                 using (var client = new WebClient())
                 {
                     client.Headers[HttpRequestHeader.ContentType] = "application/json";
+                    client.Encoding = Encoding.UTF8;
                     client.UploadString(url, "POST", data);
                 }
             }
