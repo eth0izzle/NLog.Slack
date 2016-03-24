@@ -1,7 +1,4 @@
 ﻿using System;
-
-using Newtonsoft.Json;
-
 using NLog.Slack.Models;
 
 namespace NLog.Slack
@@ -104,7 +101,7 @@ namespace NLog.Slack
 
         public void Send()
         {
-            this._client.Send(this._webHookUrl, JsonConvert.SerializeObject(_payload));
+            this._client.Send(this._webHookUrl, this._payload.ToJson());
         }
 
         //// ----------------------------------------------------------------------------------------------------------
