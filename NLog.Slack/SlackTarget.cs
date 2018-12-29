@@ -62,6 +62,7 @@ namespace NLog.Slack
             try
             {
                 this.SendToSlack(info);
+                info.Continuation(null);
             }
             catch (Exception e)
             {
