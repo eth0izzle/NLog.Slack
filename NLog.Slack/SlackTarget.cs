@@ -33,8 +33,12 @@ namespace NLog.Slack
         public bool Compact { get; set; }
 
         //// ----------------------------------------------------------------------------------------------------------
-
         public override IList<TargetPropertyWithContext> ContextProperties { get; } = new List<TargetPropertyWithContext>();
+
+        //// ----------------------------------------------------------------------------------------------------------
+
+        [ArrayParameter(typeof(TargetPropertyWithContext), "field")]
+        public IList<TargetPropertyWithContext> Fields => ContextProperties;
 
         //// ----------------------------------------------------------------------------------------------------------
 

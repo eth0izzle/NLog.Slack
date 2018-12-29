@@ -34,7 +34,11 @@ Usage
             channel="#log"
             username="NLog.Slack"
             compact="false"
-            icon=":ghost:" />
+            icon=":ghost:">
+			<field name="Machine Name" layout="${machinename}" />
+			<field name="Process Name" layout="${processname}" />
+			<field name="Process PID" layout="${processid}" />
+	</target>
   </targets>
 
   <rules>
