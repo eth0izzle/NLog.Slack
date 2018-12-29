@@ -1,6 +1,5 @@
 ﻿using System;
-using System.Diagnostics;
-using System.Linq;
+using System.Collections.Generic;
 using NLog.Common;
 using NLog.Config;
 using NLog.Layouts;
@@ -10,12 +9,8 @@ using NLog.Targets;
 namespace NLog.Slack
 {
     [Target("Slack")]
-    public class SlackTarget : TargetWithLayout
+    public class SlackTarget : TargetWithContext
     {
-        //// ----------------------------------------------------------------------------------------------------------
-
-        private readonly Process _currentProcess = Process.GetCurrentProcess();
-
         //// ----------------------------------------------------------------------------------------------------------
 
         [RequiredParameter]
@@ -39,6 +34,10 @@ namespace NLog.Slack
 
         //// ----------------------------------------------------------------------------------------------------------
 
+        public override IList<TargetPropertyWithContext> ContextProperties { get; } = new List<TargetPropertyWithContext>();
+
+        //// ----------------------------------------------------------------------------------------------------------
+
         protected override void InitializeTarget()
         {
             if (String.IsNullOrWhiteSpace(this.WebHookUrl))
@@ -51,6 +50,12 @@ namespace NLog.Slack
             if (!String.IsNullOrWhiteSpace(this.Channel.Text)
                 && (!this.Channel.Text.StartsWith("#") && !this.Channel.Text.StartsWith("@") && !this.Channel.Text.StartsWith("${")))
                 throw new ArgumentOutOfRangeException("Channel", "The Channel name is invalid. It must start with either a # or a @ symbol or use a variable.");
+
+            if (!this.Compact && this.ContextProperties.Count == 0)
+            {
+                this.ContextProperties.Add(new TargetPropertyWithContext("Process Name", Layout = "${machinename}\\${processname}"));
+                this.ContextProperties.Add(new TargetPropertyWithContext("Process PID", Layout = "${processid}"));
+            }
 
             base.InitializeTarget();
         }
@@ -80,35 +85,68 @@ namespace NLog.Slack
                 .OnError(e => info.Continuation(e))
                 .WithMessage(message);
 
-            if (!String.IsNullOrWhiteSpace(this.Channel.Render(info.LogEvent)))
-                slack.ToChannel(this.Channel.Render(info.LogEvent));
+            var channelValue = this.Channel.Render(info.LogEvent);
+            if (!String.IsNullOrWhiteSpace(channelValue))
+                slack.ToChannel(channelValue);
 
-            if (!String.IsNullOrWhiteSpace(this.Icon))
-                slack.WithIcon(this.Icon);
+            var iconValue = this.Channel.Render(info.LogEvent);
+            if (!String.IsNullOrWhiteSpace(iconValue))
+                slack.WithIcon(iconValue);
 
-            if (!String.IsNullOrWhiteSpace(this.Username.Render(info.LogEvent)))
-                slack.AsUser(this.Username.Render(info.LogEvent));
+            var usernameValue = this.Username.Render(info.LogEvent);
+            if (!String.IsNullOrWhiteSpace(usernameValue))
+                slack.AsUser(usernameValue);
 
-            if (!this.Compact)
+            if (this.ShouldIncludeProperties(info.LogEvent))
             {
                 var color = this.GetSlackColorFromLogLevel(info.LogEvent.Level);
-                var attachment = new Attachment(message) { Color = color };
-                attachment.Fields.Add(new Field("Process Name") { Value = String.Format("{0}\\{1}", (_currentProcess.MachineName != "." ? _currentProcess.MachineName : System.Environment.MachineName), _currentProcess.ProcessName), Short = true });
-                attachment.Fields.Add(new Field("Process PID") { Value = _currentProcess.Id.ToString(), Short = true });
-                slack.AddAttachment(attachment);
-
-                var exception = info.LogEvent.Exception;
-                if (exception != null)
+                Attachment attachment = new Attachment(message) { Color = color };
+                var allProperties = this.GetAllProperties(info.LogEvent);
+                foreach (var property in allProperties)
                 {
-                    var exceptionAttachment = new Attachment(exception.Message) { Color = color };
-                    exceptionAttachment.Fields.Add(new Field("Type") { Value = exception.GetType().FullName, Short = true });
+                    if (string.IsNullOrEmpty(property.Key))
+                        continue;
 
-                    if (!String.IsNullOrWhiteSpace(exception.StackTrace))
-                        exceptionAttachment.Text = exception.StackTrace;
+                    var propertyValue = property.Value?.ToString();
+                    if (string.IsNullOrEmpty(propertyValue))
+                        continue;
 
-                    slack.AddAttachment(exceptionAttachment);
+                    attachment.Fields.Add(new Field(property.Key) { Value = propertyValue, Short = true });
                 }
+                if (attachment.Fields.Count > 0)
+                    slack.AddAttachment(attachment);
+            }
+            else if (this.ContextProperties.Count > 0)
+            {
+                var color = this.GetSlackColorFromLogLevel(info.LogEvent.Level);
+                Attachment attachment = new Attachment(message) { Color = color };
+                foreach (var property in this.ContextProperties)
+                {
+                    if (string.IsNullOrEmpty(property.Name))
+                        continue;
 
+                    var propertyValue = property.Layout?.Render(info.LogEvent);
+                    if (string.IsNullOrEmpty(propertyValue))
+                        continue;
+
+                    attachment.Fields.Add(new Field(property.Name) { Value = propertyValue, Short = true });
+                }
+                if (attachment.Fields.Count > 0)
+                    slack.AddAttachment(attachment);
+            }
+
+            var exception = info.LogEvent.Exception;
+            if (!this.Compact && exception != null)
+            {
+                var color = this.GetSlackColorFromLogLevel(info.LogEvent.Level);
+                var exceptionAttachment = new Attachment(exception.Message) { Color = color };
+                exceptionAttachment.Fields.Add(new Field("Type") { Value = exception.GetType().ToString(), Short = true });
+
+                string stackTrace = exception.StackTrace;
+                if (!String.IsNullOrWhiteSpace(stackTrace))
+                    exceptionAttachment.Text = stackTrace;
+
+                slack.AddAttachment(exceptionAttachment);
             }
 
             slack.Send();
@@ -118,22 +156,21 @@ namespace NLog.Slack
 
         private string GetSlackColorFromLogLevel(LogLevel level)
         {
-            switch (level.Name.ToLowerInvariant())
-            {
-                case "warn":
-                    return "warning";
-
-                case "error":
-                case "fatal":
-                    return "danger";
-
-                case "info":
-                    return "#2a80b9";
-
-                default:
-                    return "#cccccc";
-            }
+            if (LogLevelSlackColorMap.TryGetValue(level, out var color))
+                return color;
+            else
+                return "#cccccc";
         }
+
+        //// ----------------------------------------------------------------------------------------------------------
+
+        private static readonly Dictionary<LogLevel, string> LogLevelSlackColorMap = new Dictionary<LogLevel, string>()
+        {
+            { LogLevel.Warn, "warning" },
+            { LogLevel.Error, "danger" },
+            { LogLevel.Fatal, "danger" },
+            { LogLevel.Info, "#2a80b9" },
+        };
 
         //// ----------------------------------------------------------------------------------------------------------
     }
