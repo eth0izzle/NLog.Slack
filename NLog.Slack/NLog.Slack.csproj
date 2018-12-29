@@ -11,7 +11,7 @@
     <CurrentYear>$([System.DateTime]::Now.ToString(yyyy))</CurrentYear>
     <Copyright>Copyright (c) 2014-$(CurrentYear) - Paul Price</Copyright>
 
-    <PackageTags>NLog;azure;blob;log;logging</PackageTags>
+    <PackageTags>NLog;slack;log;logging</PackageTags>
     <PackageProjectUrl>https://github.com/eth0izzle/NLog.Slack</PackageProjectUrl>
     <PackageLicenseUrl>https://github.com/eth0izzle/NLog.Slack/blob/master/LICENSE.md</PackageLicenseUrl>
     <RepositoryType>git</RepositoryType>
