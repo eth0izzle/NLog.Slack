@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -72,7 +72,7 @@ namespace NLog.Slack.Tests
             var slackTarget = new TestableSlackTarget
                 {
                     WebHookUrl = "IM A BIG FAT PHONY"
-                };
+            };
 
             slackTarget.Initialize();
         }
@@ -152,6 +152,34 @@ namespace NLog.Slack.Tests
             {
                 WebHookUrl = "http://slack.is.awesome.com",
                 Channel = "@slackbot"
+            };
+
+            slackTarget.Initialize();
+        }
+
+        //// ----------------------------------------------------------------------------------------------------------
+
+        [TestMethod]
+        public void InitializeTarget_NoChannel_TargetShouldInitialize()
+        {
+            var slackTarget = new TestableSlackTarget
+            {
+                WebHookUrl = "http://slack.is.awesome.com",
+                Channel    = null,
+            };
+
+            slackTarget.Initialize();
+        }
+
+        //// ----------------------------------------------------------------------------------------------------------
+        
+        [TestMethod]
+        public void InitializeTarget_NoUsername_TargetShouldInitialize()
+        {
+            var slackTarget = new TestableSlackTarget
+            {
+                WebHookUrl = "http://slack.is.awesome.com",
+                Username    = null,
             };
 
             slackTarget.Initialize();
