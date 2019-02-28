@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using NLog.Common;
 using NLog.Config;
@@ -51,7 +51,7 @@ namespace NLog.Slack
             if (!Uri.TryCreate(this.WebHookUrl, UriKind.Absolute, out uriResult))
                 throw new ArgumentOutOfRangeException("WebHookUrl", "Webhook URL is an invalid URL.");
 
-            if (!String.IsNullOrWhiteSpace(this.Channel.Text)
+            if (!String.IsNullOrWhiteSpace(this.Channel?.Text)
                 && (!this.Channel.Text.StartsWith("#") && !this.Channel.Text.StartsWith("@") && !this.Channel.Text.StartsWith("${")))
                 throw new ArgumentOutOfRangeException("Channel", "The Channel name is invalid. It must start with either a # or a @ symbol or use a variable.");
 
@@ -89,15 +89,15 @@ namespace NLog.Slack
                 .OnError(e => info.Continuation(e))
                 .WithMessage(message);
 
-            var channelValue = this.Channel.Render(info.LogEvent);
+            var channelValue = this.Channel?.Render(info.LogEvent);
             if (!String.IsNullOrWhiteSpace(channelValue))
                 slack.ToChannel(channelValue);
 
-            var iconValue = this.Channel.Render(info.LogEvent);
+            var iconValue = this.Icon;
             if (!String.IsNullOrWhiteSpace(iconValue))
                 slack.WithIcon(iconValue);
 
-            var usernameValue = this.Username.Render(info.LogEvent);
+            var usernameValue = this.Username?.Render(info.LogEvent);
             if (!String.IsNullOrWhiteSpace(usernameValue))
                 slack.AsUser(usernameValue);
 
