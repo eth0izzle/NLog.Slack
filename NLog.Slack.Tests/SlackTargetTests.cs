@@ -72,7 +72,7 @@ namespace NLog.Slack.Tests
             var slackTarget = new TestableSlackTarget
                 {
                     WebHookUrl = "IM A BIG FAT PHONY"
-            };
+                };
 
             slackTarget.Initialize();
         }
