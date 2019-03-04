@@ -4,11 +4,7 @@ namespace NLog.Slack.Demo
 {
     public static class Program
     {
-        //// ----------------------------------------------------------------------------------------------------------
-
         private static Logger _logger = LogManager.GetCurrentClassLogger();
-
-        //// ----------------------------------------------------------------------------------------------------------
 
         public static void Main(string[] args)
         {
@@ -18,7 +14,7 @@ namespace NLog.Slack.Demo
 
             try
             {
-                CreateBigStackTrace(20);
+                CreateBigStackTrace(5);
             }
             catch (Exception ex)
             {
@@ -29,20 +25,14 @@ namespace NLog.Slack.Demo
             Console.ReadLine();
         }
 
-        //// ----------------------------------------------------------------------------------------------------------
-
         private static void CreateBigStackTrace(int lines)
         {
             if (lines < 1)
             {
                 throw new ApplicationException("I'm the exception to the rule.");
             }
-            else
-            {
-                CreateBigStackTrace(lines - 1);
-            }
-        }
 
-        //// ----------------------------------------------------------------------------------------------------------
+            CreateBigStackTrace(lines - 1);
+        }
     }
 }

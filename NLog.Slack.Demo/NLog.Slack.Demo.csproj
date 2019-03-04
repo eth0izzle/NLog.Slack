@@ -59,6 +59,12 @@
     </None>
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\NLog.Slack\NLog.Slack.csproj">
+      <Project>{fae87ebe-2697-4e8d-b949-81b75e40b9ff}</Project>
+      <Name>NLog.Slack</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

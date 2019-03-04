@@ -80,7 +80,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\NLog.Slack\NLog.Slack.csproj">
-      <Project>{eed44218-2fd9-4d65-8d6f-f1de6ad37488}</Project>
+      <Project>{fae87ebe-2697-4e8d-b949-81b75e40b9ff}</Project>
       <Name>NLog.Slack</Name>
     </ProjectReference>
   </ItemGroup>

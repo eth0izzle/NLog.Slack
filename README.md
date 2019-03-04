@@ -4,6 +4,8 @@ An NLog target for Slack - your logs in one place and instantly searchable, ever
 
 ![NLog.Slack](http://i.imgur.com/xRlfNrN.png)
 
+**Note**: it is no longer possible to pass in a custom channel, username or icon. This must be defined by your Slack App.
+
 Installation
 ============
 Via [NuGet](https://www.nuget.org/packages/NLog.Slack/): ```Install-Package NLog.Slack```
@@ -12,8 +14,10 @@ Via [NuGet](https://www.nuget.org/packages/NLog.Slack/): ```Install-Package NLog
 
 Usage
 =====
-1. Create a [new Incoming Webhook integration](https://www.slack.com/integrations).
-2. Configure NLog to use `NLog.Slack`:
+1. Create a [new Slack App](https://api.slack.com/apps?new_app=1) in the correct Workspace.
+2. Add the [Incoming Webhooks](https://api.slack.com/apps/AGNC720HF/incoming-webhooks?) functionality to your App.
+3. Generate a new Webhook URL and Authorize it to post to a channel.
+4. Copy your Webhook URL and configure NLog via your NLog.config file or programmatically, as below.
 
 ### NLog.config
 
@@ -30,11 +34,9 @@ Usage
     <target xsi:type="Slack"
             name="slackTarget"
             layout="${message}"
-            webHookUrl="https://xxx.slack.com/services/hooks/incoming-webhook?token=xxx"
-            channel="#log"
-            username="NLog.Slack"
-            compact="false"
-            icon=":ghost:">
+            webHookUrl="https://hooks.slack.com/services/T00000000/B00000000/XXXXXXXXXXXXXXXXXXXXXXXX"
+            compact="false">
+
 			<field name="Machine Name" layout="${machinename}" />
 			<field name="Process Name" layout="${processname}" />
 			<field name="Process PID" layout="${processid}" />
@@ -56,8 +58,7 @@ var config = new LoggingConfiguration();
 var slackTarget = new SlackTarget
 {
       Layout = "${message}",
-      WebHookUrl = "http://xxx.slack.com/services/hooks/incoming-webhook?token=xxx",
-      Channel = "#log"
+      WebHookUrl = "https://hooks.slack.com/services/T00000000/B00000000/XXXXXXXXXXXXXXXXXXXXXXXX",
 };
 
 config.AddTarget("slack", slackTarget);
@@ -75,7 +76,4 @@ And you're good to go!
 Key        | Description
 ----------:| -----------
 WebHookUrl | Grab your Webhook URL (__with the token__) from your Incoming Webhooks integration in Slack
-Channel    | The channel name (e.g #log) or user (e.g. @eth0) to send NLog messages to. Leave blank to use the integration default
-Username   | Name of the user that NLog messages comes from. Leave blank to use the integration default
 Compact    | Set to true to just send the NLog layout text (no process info, colors, etc)
-Icon       | Leave blank to use the integration default. Can either be a URL or Emoji
