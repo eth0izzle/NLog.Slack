@@ -53,12 +53,14 @@ namespace NLog.Slack
 
         private void SendToSlack(AsyncLogEventInfo info)
         {
+            var message = RenderLogEvent(Layout, info.LogEvent);
+
             var slack = SlackMessageBuilder
                 .Build(this.WebHookUrl)
                 .OnError(e => info.Continuation(e))
-                .WithMessage(info.LogEvent.Message);
+                .WithMessage(message);
 
-            if (this.ShouldIncludeProperties(info.LogEvent))
+            if (this.ShouldIncludeProperties(info.LogEvent) || this.ContextProperties.Count > 0)
             {
                 var color = this.GetSlackColorFromLogLevel(info.LogEvent.Level);
                 Attachment attachment = new Attachment(info.LogEvent.Message) { Color = color };
@@ -77,25 +79,7 @@ namespace NLog.Slack
                 if (attachment.Fields.Count > 0)
                     slack.AddAttachment(attachment);
             }
-            else if (this.ContextProperties.Count > 0)
-            {
-                var color = this.GetSlackColorFromLogLevel(info.LogEvent.Level);
-                Attachment attachment = new Attachment(info.LogEvent.Message) { Color = color };
-                foreach (var property in this.ContextProperties)
-                {
-                    if (string.IsNullOrEmpty(property.Name))
-                        continue;
-
-                    var propertyValue = property.Layout?.Render(info.LogEvent);
-                    if (string.IsNullOrEmpty(propertyValue))
-                        continue;
-
-                    attachment.Fields.Add(new Field(property.Name) { Value = propertyValue, Short = true });
-                }
-                if (attachment.Fields.Count > 0)
-                    slack.AddAttachment(attachment);
-            }
-
+      
             var exception = info.LogEvent.Exception;
             if (!this.Compact && exception != null)
             {

@@ -18,10 +18,8 @@
         <choice minOccurs="0" maxOccurs="unbounded">
           <element name="layout" type="nlog:Layout" minOccurs="0" maxOccurs="1" />
           <element name="webHookUrl" type="string" minOccurs="1" maxOccurs="1" nillable="false" />
-          <element name="channel" type="string" minOccurs="0" maxOccurs="1" />
-          <element name="username" type="string" minOccurs="0" maxOccurs="1" />
           <element name="compact" type="boolean" minOccurs="0" maxOccurs="1" default="false" />
-          <element name="icon" type="strng" minOccurs="0" maxOccurs="1" />
+          <element name="field" minOccurs="0" maxOccurs="unbounded" type="NLog.Targets.TargetPropertyWithContext" />
         </choice>
         <attribute name="layout" type="nlog:SimpleLayoutAttribute">
           <annotation>
@@ -33,27 +31,28 @@
             <documentation>Grab your Webhook URL (with the token) from your Incoming WebHooks integration in Slack</documentation>
           </annotation>
         </attribute>
-        <attribute name="channel" type="string">
-          <annotation>
-            <documentation>The channel name (e.g #log) or user (e.g. @eth0) to send NLog messages to. Leave blank to use the integration default.</documentation>
-          </annotation>
-        </attribute>
-        <attribute name="username" type="string">
-          <annotation>
-            <documentation>Name of the user that NLog messages comes from. Leave blank to use the integration default.</documentation>
-          </annotation>
-        </attribute>
         <attribute name="compact" type="boolean" default="false">
           <annotation>
-            <documentation>Set to true to just send the NLog layout text (no process info, colors, etc)</documentation>
-          </annotation>
-        </attribute>
-        <attribute name="icon" type="string">
-          <annotation>
-            <documentation>Leave blank to use the integration default. Can either be a URL or Emoji.</documentation>
+            <documentation>Set to true to just send the NLog layout text (no process info, exception, etc)</documentation>
           </annotation>
         </attribute>
       </extension>
     </complexContent>
+  </complexType>
+  <complexType name="NLog.Targets.TargetPropertyWithContext">
+    <choice minOccurs="0" maxOccurs="unbounded">
+      <element name="layout" minOccurs="0" maxOccurs="1" type="nlog:Layout" />
+      <element name="name" minOccurs="0" maxOccurs="1" type="string" />
+    </choice>
+    <attribute name="layout" type="nlog:SimpleLayoutAttribute">
+      <annotation>
+        <documentation>Layout that should be use to calculate the value for the field.</documentation>
+      </annotation>
+    </attribute>
+    <attribute name="name" type="string">
+      <annotation>
+        <documentation>Field name.</documentation>
+      </annotation>
+    </attribute>
   </complexType>
 </schema>
