@@ -1,10 +1,10 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net45</TargetFrameworks>
+    <TargetFrameworks>net45;netstandard2.0</TargetFrameworks>
 
-    <Description>NLog target for Slack - your logs in one place and instantly searchable, everywhere.
-</Description>
+    <Title>NLog.Slack</Title>
+    <Description>NLog target for Slack - your logs in one place and instantly searchable, everywhere.</Description>
     <Authors>Paul Price</Authors>
     <Company>darkport</Company>
     <CurrentYear>$([System.DateTime]::Now.ToString(yyyy))</CurrentYear>
@@ -13,12 +13,13 @@
     <PackageTags>NLog;slack;log;logging</PackageTags>
     <PackageProjectUrl>https://github.com/eth0izzle/NLog.Slack</PackageProjectUrl>
     <PackageLicenseUrl>https://github.com/eth0izzle/NLog.Slack/blob/master/LICENSE.md</PackageLicenseUrl>
+    <PackageIconUrl>https://raw.githubusercontent.com/eth0izzle/NLog.Slack/master/nuget.png</PackageIconUrl>
     <RepositoryType>git</RepositoryType>
     <RepositoryUrl>https://github.com/eth0izzle/NLog.Slack.git</RepositoryUrl>
 
-    <Version>1.0.4.0</Version>
+    <Version>1.0.5.0</Version>
 
-    <AssemblyVersion>1.0.4.0</AssemblyVersion>
+    <AssemblyVersion>1.0.5.0</AssemblyVersion>
 
     <AutoGenerateBindingRedirects>false</AutoGenerateBindingRedirects>
   </PropertyGroup>
