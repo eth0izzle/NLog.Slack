@@ -1,5 +1,8 @@
 NLog.Slack
 ==========
+
+[![Nuget](https://img.shields.io/nuget/v/NLog.Slack.svg)](https://www.nuget.org/packages/NLog.Slack/)
+
 An NLog target for Slack - your logs in one place and instantly searchable, everywhere.
 
 ![NLog.Slack](http://i.imgur.com/xRlfNrN.png)
