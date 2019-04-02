@@ -56,7 +56,7 @@ Note: it's recommended to set ```async="true"``` on `targets` so if the HTTP cal
 
 ### Programmatically 
 
-```
+```c#
 var config = new LoggingConfiguration();
 var slackTarget = new SlackTarget
 {
