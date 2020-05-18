@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using NLog.Common;
 using NLog.Config;
+using NLog.Layouts;
 using NLog.Slack.Models;
 using NLog.Targets;
 
@@ -11,7 +12,7 @@ namespace NLog.Slack
     public class SlackTarget : TargetWithContext
     {
         [RequiredParameter]
-        public string WebHookUrl { get; set; }
+        public Layout WebHookUrl { get; set; }
 
         public bool Compact { get; set; }
 
@@ -22,11 +23,12 @@ namespace NLog.Slack
 
         protected override void InitializeTarget()
         {
-            if (String.IsNullOrWhiteSpace(this.WebHookUrl))
+            var webHookUrl = GetWebHookUrl();
+            if (String.IsNullOrWhiteSpace(webHookUrl))
                 throw new ArgumentOutOfRangeException("WebHookUrl", "Webhook URL cannot be empty.");
 
             Uri uriResult;
-            if (!Uri.TryCreate(this.WebHookUrl, UriKind.Absolute, out uriResult))
+            if (!Uri.TryCreate(webHookUrl, UriKind.Absolute, out uriResult))
                 throw new ArgumentOutOfRangeException("WebHookUrl", "Webhook URL is an invalid URL.");
 
             if (!this.Compact && this.ContextProperties.Count == 0)
@@ -55,8 +57,9 @@ namespace NLog.Slack
         {
             var message = RenderLogEvent(Layout, info.LogEvent);
 
+            var webHookUrl = GetWebHookUrl(info.LogEvent);
             var slack = SlackMessageBuilder
-                .Build(this.WebHookUrl)
+                .Build(webHookUrl)
                 .OnError(e => info.Continuation(e))
                 .WithMessage(message);
 
@@ -110,5 +113,10 @@ namespace NLog.Slack
             { LogLevel.Fatal, "danger" },
             { LogLevel.Info, "#2a80b9" },
         };
+
+        private string GetWebHookUrl(LogEventInfo eventInfo = null)
+        {
+            return WebHookUrl?.Render(eventInfo ?? LogEventInfo.CreateNullEvent());
+        }
     }
 }
