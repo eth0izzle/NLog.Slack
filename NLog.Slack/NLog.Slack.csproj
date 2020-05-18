@@ -3,19 +3,18 @@
   <PropertyGroup>
     <TargetFrameworks>net45;netstandard2.0</TargetFrameworks>
 
-    <Title>NLog.Slack</Title>
-    <Description>NLog target for Slack - your logs in one place and instantly searchable, everywhere.</Description>
-    <Authors>Paul Price</Authors>
-    <Company>darkport</Company>
+    <Title>DR.NLog.Slack</Title>
+    <Description>NLog target for Slack - your logs in one place and instantly searchable, everywhere. (forked from https://github.com/eth0izzle/NLog.Slack)</Description>
+    <Authors>DR TU - MedieAPI Team</Authors>
+    <Company>DR (Danish Broadcasting Corporation)</Company>
     <CurrentYear>$([System.DateTime]::Now.ToString(yyyy))</CurrentYear>
-    <Copyright>Copyright (c) 2014-$(CurrentYear) - Paul Price</Copyright>
 
     <PackageTags>NLog;slack;log;logging</PackageTags>
-    <PackageProjectUrl>https://github.com/eth0izzle/NLog.Slack</PackageProjectUrl>
-    <PackageLicenseUrl>https://github.com/eth0izzle/NLog.Slack/blob/master/LICENSE.md</PackageLicenseUrl>
-    <PackageIconUrl>https://raw.githubusercontent.com/eth0izzle/NLog.Slack/master/nuget.png</PackageIconUrl>
+    <PackageProjectUrl>https://github.com/drdk/NLog.Slack</PackageProjectUrl>
+    <PackageLicenseUrl>https://github.com/drdk/NLog.Slack/blob/master/LICENSE.md</PackageLicenseUrl>
+    <PackageIconUrl>https://raw.githubusercontent.com/drdk/NLog.Slack/master/nuget.png</PackageIconUrl>
     <RepositoryType>git</RepositoryType>
-    <RepositoryUrl>https://github.com/eth0izzle/NLog.Slack.git</RepositoryUrl>
+    <RepositoryUrl>https://github.com/drdk/NLog.Slack.git</RepositoryUrl>
 
     <Version>1.0.5.0</Version>
 
