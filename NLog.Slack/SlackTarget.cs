@@ -84,12 +84,11 @@ namespace NLog.Slack
             if (!this.Compact && exception != null)
             {
                 var color = this.GetSlackColorFromLogLevel(info.LogEvent.Level);
-                var exceptionAttachment = new Attachment(exception.Message) { Color = color };
-                exceptionAttachment.Fields.Add(new Field("StackTrace") {
-                    Title = $"Type: {exception.GetType().ToString()}",
-                    Value = exception.StackTrace ?? "N/A"
-                });
-
+                var exceptionAttachment = new Attachment(null)
+                {
+                    Color = color,
+                    Text = $"*Exception*\n```{exception}```"
+                };
                 slack.AddAttachment(exceptionAttachment);
             }
 
