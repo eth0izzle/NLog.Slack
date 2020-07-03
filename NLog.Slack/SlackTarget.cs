@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text.RegularExpressions;
 using NLog.Common;
 using NLog.Config;
 using NLog.Slack.Models;
@@ -19,6 +21,8 @@ namespace NLog.Slack
 
         [ArrayParameter(typeof(TargetPropertyWithContext), "field")]
         public IList<TargetPropertyWithContext> Fields => ContextProperties;
+
+        private const int stackTraceChunk = 1990;
 
         protected override void InitializeTarget()
         {
@@ -84,13 +88,22 @@ namespace NLog.Slack
             if (!this.Compact && exception != null)
             {
                 var color = this.GetSlackColorFromLogLevel(info.LogEvent.Level);
-                var exceptionAttachment = new Attachment(exception.Message) { Color = color };
-                exceptionAttachment.Fields.Add(new Field("StackTrace") {
-                    Title = $"Type: {exception.GetType().ToString()}",
-                    Value = exception.StackTrace ?? "N/A"
-                });
+                var attachment = new Attachment(exception.Message) { Color = color };
 
-                slack.AddAttachment(exceptionAttachment);
+                attachment.Fields.Add(new Field("Exception Message") { Value = exception.Message, Short = false });
+                attachment.Fields.Add(new Field("Exception Type") { Value = exception.GetType().Name, Short = true });
+
+                if (!string.IsNullOrWhiteSpace(exception.StackTrace))
+                {
+                    var parts = exception.StackTrace.SplitOn(stackTraceChunk).ToArray(); // Split call stack into consecutive fields of ~2k characters
+                    for (int idx = 0; idx < parts.Length; idx++)
+                    {
+                        var name = "StackTrace" + (idx > 0 ? $" {idx + 1}" : null);
+                        attachment.Fields.Add(new Field(name) { Value = "```" + parts[idx].Replace("```", "'''") + "```" });
+                    }
+                }
+
+                slack.AddAttachment(attachment);
             }
 
             slack.Send();
@@ -111,5 +124,15 @@ namespace NLog.Slack
             { LogLevel.Fatal, "danger" },
             { LogLevel.Info, "#2a80b9" },
         };
+    }
+
+    // source: https://github.com/jonfreeland/Log4Slack
+    internal static class Extensions
+    {
+        public static IEnumerable<string> SplitOn(this string text, int numChars)
+        {
+            var splitOnPattern = new Regex($@"(?<line>.{{1,{numChars}}})([\r\n]|$)", RegexOptions.Singleline | RegexOptions.IgnoreCase);
+            return splitOnPattern.Matches(text).OfType<Match>().Select(m => m.Groups["line"].Value);
+        }
     }
 }
