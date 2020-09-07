@@ -31,8 +31,8 @@ namespace NLog.Slack
 
             if (!this.Compact && this.ContextProperties.Count == 0)
             {
-                this.ContextProperties.Add(new TargetPropertyWithContext("Process Name", Layout = "${machinename}\\${processname}"));
-                this.ContextProperties.Add(new TargetPropertyWithContext("Process PID", Layout = "${processid}"));
+                this.ContextProperties.Add(new TargetPropertyWithContext("Process Name", Layouts.Layout.FromString("${machinename}\\${processname}")));
+                this.ContextProperties.Add(new TargetPropertyWithContext("Process PID", Layouts.Layout.FromString("${processid}")));
             }
 
             base.InitializeTarget();
@@ -83,11 +83,13 @@ namespace NLog.Slack
             var exception = info.LogEvent.Exception;
             if (!this.Compact && exception != null)
             {
+                var stackTrace = RenderLogEvent(Layouts.Layout.FromString("${exception:format=tostring}"), info.LogEvent);
+
                 var color = this.GetSlackColorFromLogLevel(info.LogEvent.Level);
                 var exceptionAttachment = new Attachment(exception.Message) { Color = color };
                 exceptionAttachment.Fields.Add(new Field("StackTrace") {
                     Title = $"Type: {exception.GetType().ToString()}",
-                    Value = exception.StackTrace ?? "N/A"
+                    Value = stackTrace ?? "N/A"
                 });
 
                 slack.AddAttachment(exceptionAttachment);
