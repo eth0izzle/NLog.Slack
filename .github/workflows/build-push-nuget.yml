@@ -1,0 +1,62 @@
+name: NuGet Generation
+
+on:
+  push:
+    branches:
+      - main
+      - master
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-18.04
+    defaults:
+      run:
+        working-directory: .
+    name: Update NuGet package
+    env:
+        PACKAGE_PROJECT: NLog.Slack
+        TEST_PROJECT:
+    steps:
+
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Setup .NET Core @ Latest
+        uses: actions/setup-dotnet@v1
+        with:
+          source-url: https://nuget.pkg.github.com/drdk/index.json
+        env:
+          NUGET_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
+          
+      - name: Build test project and run tests
+        if: env.TEST_PROJECT != ''
+        run: |
+          dotnet test './${{ env.TEST_PROJECT }}/${{ env.TEST_PROJECT }}.csproj'
+          
+      - name: Get branch name
+        id: branch-name
+        uses: tj-actions/branch-names@v5
+
+      - name: Running on a pull request branch, so get branch name to add to Version
+        if: steps.branch-name.outputs.is_default == 'false'
+        run: |
+          echo "PR_BRANCH_NAME=-${{ steps.branch-name.outputs.current_branch }}" >> $GITHUB_ENV
+
+      - name: Update project file version
+        uses: jacobtomlinson/gha-find-replace@v1
+        with:
+          find: '(<Version>\d+\.\d+)\.(\d+)(<)'
+          replace: '$1.${{ github.run_number }}${{ env.PR_BRANCH_NAME }}$3'
+          include: './${{ env.PACKAGE_PROJECT }}/${{ env.PACKAGE_PROJECT }}.csproj'
+
+      # Force GeneratePackageOnBuild to false since dotnet pack does not build when
+      # it is true (https://github.com/dotnet/sdk/issues/10335)
+      - name: Build solution and generate NuGet package
+        run: |
+          dotnet pack './${{ env.PACKAGE_PROJECT }}/${{ env.PACKAGE_PROJECT }}.csproj' -c Release -o out /p:GeneratePackageOnBuild=false
+
+      # Skip duplicates since GPR does not support symbols in a separate nupkg file
+      - name: Push generated package to GitHub registry
+        run: dotnet nuget push ./out/*.nupkg --skip-duplicate
+
