@@ -14,6 +14,8 @@ namespace NLog.Slack
         [RequiredParameter]
         public Layout WebHookUrl { get; set; }
 
+        public Layout WebProxyUrl { get; set; }
+
         public bool Compact { get; set; }
 
         public override IList<TargetPropertyWithContext> ContextProperties { get; } = new List<TargetPropertyWithContext>();
@@ -53,8 +55,10 @@ namespace NLog.Slack
             if (String.IsNullOrWhiteSpace(webHookUrl))
                 throw new ArgumentOutOfRangeException("WebHookUrl", "Webhook URL cannot be empty.");
 
+            var webProxyUrl = RenderLogEvent(WebProxyUrl, info.LogEvent);
+
             var slack = SlackMessageBuilder
-                .Build(webHookUrl)
+                .Build(webHookUrl, webProxyUrl)
                 .OnError(e => info.Continuation(e))
                 .WithMessage(message);
 

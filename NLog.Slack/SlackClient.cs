@@ -8,12 +8,15 @@ namespace NLog.Slack
     {
         public event Action<Exception> Error;
 
-        public void Send(string url, string data)
+        public void Send(string url, string data, string webProxyUrl = null)
         {
             try
             {
                 using (var client = new WebClient())
                 {
+                    if (!string.IsNullOrWhiteSpace(webProxyUrl))
+                        client.Proxy = new WebProxy(webProxyUrl);
+
                     client.Headers[HttpRequestHeader.ContentType] = "application/json";
                     client.Encoding = Encoding.UTF8;
                     client.UploadString(url, "POST", data);

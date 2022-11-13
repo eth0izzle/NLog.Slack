@@ -7,20 +7,23 @@ namespace NLog.Slack
     {
         private readonly string _webHookUrl;
 
+        private readonly string _webProxyUrl;
+
         private readonly SlackClient _client;
 
         private readonly Payload _payload;
 
-        public SlackMessageBuilder(string webHookUrl)
+        public SlackMessageBuilder(string webHookUrl, string webProxyUrl = null)
         {
             this._webHookUrl = webHookUrl;
+            this._webProxyUrl = webProxyUrl;
             this._client = new SlackClient();
             this._payload = new Payload();
         }
 
-        public static SlackMessageBuilder Build(string webHookUrl)
+        public static SlackMessageBuilder Build(string webHookUrl, string webProxyUrl = null)
         {
-            return new SlackMessageBuilder(webHookUrl);
+            return new SlackMessageBuilder(webHookUrl, webProxyUrl);
         }
 
         public SlackMessageBuilder WithMessage(string message)
@@ -46,7 +49,7 @@ namespace NLog.Slack
 
         public void Send()
         {
-            this._client.Send(this._webHookUrl, this._payload.ToJson());
+            this._client.Send(this._webHookUrl, this._payload.ToJson(), this._webProxyUrl);
         }
     }
 }

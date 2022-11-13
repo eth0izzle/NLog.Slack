@@ -80,3 +80,4 @@ Key        | Description
 ----------:| -----------
 WebHookUrl | Grab your Webhook URL (__with the token__) from your Incoming Webhooks integration in Slack
 Compact    | Set to true to just send the NLog layout text (no process info, colors, etc)
+WebProxyUrl | Url for custom WebProxy (Optional)
